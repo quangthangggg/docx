@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  docx-processor:
+    build: .
+    container_name: docx-processor-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist logs
+      - ./logs:/app/logs
+      # Persist output files
+      - ./outputs:/app/outputs
+      # Persist zip files
+      - ./zips:/app/zips
+      # Mount uploads (optional, for debugging)
+      - ./uploads:/app/uploads
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - docx-network
+
+networks:
+  docx-network:
+    driver: bridge
