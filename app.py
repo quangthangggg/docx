@@ -3,7 +3,7 @@
 FastAPI application để xử lý file docx
 UPDATED: Xử lý cả tables trong các khối tag "0" và xóa trang đầu nếu chỉ có "thẻ 1"
 """
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from typing import List
@@ -344,6 +344,15 @@ def process_docx_file(input_path, output_path):
         shutil.rmtree(temp_dir)
         logger.info(f"Đã dọn dẹp thư mục tạm: {temp_dir}")
 
+def cleanup_file(file_path: str):
+    """Xóa file sau khi download xong"""
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            logger.info(f"Đã xóa file sau khi download: {file_path}")
+    except Exception as e:
+        logger.error(f"Lỗi khi xóa file {file_path}: {str(e)}")
+
 # ===== API ENDPOINTS =====
 
 @app.get("/", response_class=HTMLResponse)
@@ -526,14 +535,20 @@ async def process_multiple_files(files: List[UploadFile] = File(...)):
             raise HTTPException(status_code=500, detail=f"Lỗi khi xử lý files: {str(e)}")
 
 @app.get("/download/{filename}")
-async def download_file(filename: str):
+async def download_file(filename: str, background_tasks: BackgroundTasks):
     """
     Endpoint để tải file đã xử lý
+    File sẽ tự động bị xóa sau khi download xong
     """
     file_path = os.path.join(OUTPUT_DIR, filename)
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File không tồn tại")
+
+    # Thêm task xóa file sau khi download
+    background_tasks.add_task(cleanup_file, file_path)
+    
+    logger.info(f"Đang gửi file để download: {filename}")
 
     return FileResponse(
         path=file_path,
@@ -542,14 +557,20 @@ async def download_file(filename: str):
     )
 
 @app.get("/download-zip/{filename}")
-async def download_zip(filename: str):
+async def download_zip(filename: str, background_tasks: BackgroundTasks):
     """
     Endpoint để tải file zip
+    File sẽ tự động bị xóa sau khi download xong
     """
     file_path = os.path.join(ZIP_DIR, filename)
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File không tồn tại")
+
+    # Thêm task xóa file sau khi download
+    background_tasks.add_task(cleanup_file, file_path)
+    
+    logger.info(f"Đang gửi file zip để download: {filename}")
 
     return FileResponse(
         path=file_path,
