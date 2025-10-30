@@ -8,3 +8,101 @@
 2025-10-30 16:16:54 - docx_processor - INFO - Application started with 4 workers
 2025-10-30 16:16:54 - docx_processor - INFO - Application started with 4 workers
 2025-10-30 16:33:19 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 16:58:26 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 16:59:47 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:02:59 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:15:44 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:30:52 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:34:56 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:51:04 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:51:04 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:51:04 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 17:51:04 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:02:36 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:02:36 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:02:36 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:02:36 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:02:57 - docx_processor - INFO - Nhận request xử lý 1 file(s)
+2025-10-30 18:02:57 - docx_processor - INFO - Nhận request xử lý 1 file(s)
+2025-10-30 18:02:57 - docx_processor - INFO - Lưu file upload: input_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Lưu file upload: input_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Bắt đầu xử lý file: uploads/input_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Bắt đầu xử lý file: uploads/input_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Đang giải nén file docx...
+2025-10-30 18:02:57 - docx_processor - INFO - Đang giải nén file docx...
+2025-10-30 18:02:57 - docx_processor - INFO - Bắt đầu xử lý document.xml (thông qua main.py)
+2025-10-30 18:02:57 - docx_processor - INFO - Bắt đầu xử lý document.xml (thông qua main.py)
+2025-10-30 18:02:57 - docx_processor - INFO - Hoàn thành xử lý document.xml (thông qua main.py)
+2025-10-30 18:02:57 - docx_processor - INFO - Hoàn thành xử lý document.xml (thông qua main.py)
+2025-10-30 18:02:57 - docx_processor - INFO - Đang tạo file output: outputs/processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Đang tạo file output: outputs/processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - ✅ Hoàn thành! File đã được lưu tại: outputs/processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - ✅ Hoàn thành! File đã được lưu tại: outputs/processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Đã dọn dẹp thư mục tạm: /tmp/tmp5aghnplk
+2025-10-30 18:02:57 - docx_processor - INFO - Đã dọn dẹp thư mục tạm: /tmp/tmp5aghnplk
+2025-10-30 18:02:57 - docx_processor - INFO - Xử lý thành công file: BM1_BCDX_NEW 1423224Đào Huy Cương.docx -> processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Xử lý thành công file: BM1_BCDX_NEW 1423224Đào Huy Cương.docx -> processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Đang gửi file để download: processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Đang gửi file để download: processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Đã xóa file sau khi download: outputs/processed_20251030_180257.docx
+2025-10-30 18:02:57 - docx_processor - INFO - Đã xóa file sau khi download: outputs/processed_20251030_180257.docx
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:12 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:08:24 - docx_processor - INFO - Nhận request xử lý 1 file(s)
+2025-10-30 18:08:24 - docx_processor - INFO - Lưu file upload: input_20251030_180824.docx
+2025-10-30 18:08:24 - docx_processor - INFO - Bắt đầu xử lý file: uploads/input_20251030_180824.docx
+2025-10-30 18:08:24 - docx_processor - INFO - Đang giải nén file docx...
+2025-10-30 18:08:24 - docx_processor - INFO - Bắt đầu xử lý document.xml (thông qua main.py)
+2025-10-30 18:08:24 - docx_processor - INFO - Hoàn thành xử lý document.xml (thông qua main.py)
+2025-10-30 18:08:24 - docx_processor - INFO - Đang tạo file output: outputs/processed_20251030_180824.docx
+2025-10-30 18:08:25 - docx_processor - INFO - ✅ Hoàn thành! File đã được lưu tại: outputs/processed_20251030_180824.docx
+2025-10-30 18:08:25 - docx_processor - INFO - Đã dọn dẹp thư mục tạm: /tmp/tmpaa70xodh
+2025-10-30 18:08:25 - docx_processor - INFO - Xử lý thành công file: BM1_BCDX_NEW 1423224Đào Huy Cương.docx -> processed_20251030_180824.docx
+2025-10-30 18:08:25 - docx_processor - INFO - Đang gửi file để download: processed_20251030_180824.docx
+2025-10-30 18:08:25 - docx_processor - INFO - Đã xóa file sau khi download: outputs/processed_20251030_180824.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Nhận request xử lý 1 file(s)
+2025-10-30 18:10:39 - docx_processor - INFO - Nhận request xử lý 1 file(s)
+2025-10-30 18:10:39 - docx_processor - INFO - Lưu file upload: input_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Lưu file upload: input_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Bắt đầu xử lý file: uploads/input_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Bắt đầu xử lý file: uploads/input_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Đang giải nén file docx...
+2025-10-30 18:10:39 - docx_processor - INFO - Đang giải nén file docx...
+2025-10-30 18:10:39 - docx_processor - INFO - Bắt đầu xử lý document.xml (thông qua main.py)
+2025-10-30 18:10:39 - docx_processor - INFO - Bắt đầu xử lý document.xml (thông qua main.py)
+2025-10-30 18:10:39 - docx_processor - INFO - Hoàn thành xử lý document.xml (thông qua main.py)
+2025-10-30 18:10:39 - docx_processor - INFO - Hoàn thành xử lý document.xml (thông qua main.py)
+2025-10-30 18:10:39 - docx_processor - INFO - Đang tạo file output: outputs/processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Đang tạo file output: outputs/processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - ✅ Hoàn thành! File đã được lưu tại: outputs/processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - ✅ Hoàn thành! File đã được lưu tại: outputs/processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Đã dọn dẹp thư mục tạm: /tmp/tmpktgjoqpy
+2025-10-30 18:10:39 - docx_processor - INFO - Đã dọn dẹp thư mục tạm: /tmp/tmpktgjoqpy
+2025-10-30 18:10:39 - docx_processor - INFO - Xử lý thành công file: BM3_TTHTLS - 8376838 Nguyễn Thị Hồng Ngọc.docx -> processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Xử lý thành công file: BM3_TTHTLS - 8376838 Nguyễn Thị Hồng Ngọc.docx -> processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Đang gửi file để download: processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Đang gửi file để download: processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Đã xóa file sau khi download: outputs/processed_20251030_181039.docx
+2025-10-30 18:10:39 - docx_processor - INFO - Đã xóa file sau khi download: outputs/processed_20251030_181039.docx
+2025-10-30 18:12:33 - docx_processor - INFO - Nhận request xử lý 1 file(s)
+2025-10-30 18:12:33 - docx_processor - INFO - Lưu file upload: input_20251030_181233.docx
+2025-10-30 18:12:33 - docx_processor - INFO - Bắt đầu xử lý file: uploads/input_20251030_181233.docx
+2025-10-30 18:12:33 - docx_processor - INFO - Đang giải nén file docx...
+2025-10-30 18:12:33 - docx_processor - INFO - Bắt đầu xử lý document.xml (thông qua main.py)
+2025-10-30 18:12:33 - docx_processor - INFO - Hoàn thành xử lý document.xml (thông qua main.py)
+2025-10-30 18:12:33 - docx_processor - INFO - Đang tạo file output: outputs/processed_20251030_181233.docx
+2025-10-30 18:12:33 - docx_processor - INFO - ✅ Hoàn thành! File đã được lưu tại: outputs/processed_20251030_181233.docx
+2025-10-30 18:12:33 - docx_processor - INFO - Đã dọn dẹp thư mục tạm: /tmp/tmpv7k51775
+2025-10-30 18:12:33 - docx_processor - INFO - Xử lý thành công file: BM1_BCDX_NEW 3312388Nguyễn Quảng Lạc.docx -> processed_20251030_181233.docx
+2025-10-30 18:12:33 - docx_processor - INFO - Đang gửi file để download: processed_20251030_181233.docx
+2025-10-30 18:12:33 - docx_processor - INFO - Đã xóa file sau khi download: outputs/processed_20251030_181233.docx
+2025-10-30 18:19:14 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:19:14 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:19:14 - docx_processor - INFO - Application started with 4 workers
+2025-10-30 18:19:14 - docx_processor - INFO - Application started with 4 workers
