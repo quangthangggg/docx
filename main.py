@@ -295,9 +295,14 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
         if in_block:
             if end_match:
                 in_block = False
-                # Xoá tag [[END_TAG]] khỏi node này
-                if node.tagName == 'w:p':
-                    _cut_before_end_in_paragraph(node, end_pat)
+                # Check if the node will be empty after removing the tag
+                node_text_after_removal = re.sub(end_pat, '', node_text, flags=re.DOTALL)
+                if not node_text_after_removal.strip():
+                    nodes_to_remove.append(node)
+                else:
+                    # Xoá tag [[END_TAG]] khỏi node này
+                    if node.tagName == 'w:p':
+                        _cut_before_end_in_paragraph(node, end_pat)
             else:
                 nodes_to_remove.append(node)
 
@@ -313,8 +318,14 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
             else:
                 # Bắt đầu một block mới
                 in_block = True
-                # Xóa toàn bộ node chứa START_TAG
-                nodes_to_remove.append(node)
+                # Check if the node will be empty after removing the tag and content after it
+                node_text_after_removal = re.sub(start_pat + r'.*$', '', node_text, flags=re.DOTALL)
+                if not node_text_after_removal.strip():
+                    nodes_to_remove.append(node)
+                else:
+                    # Chỉ xoá tag và phần sau nó
+                    if node.tagName == 'w:p':
+                        _cut_after_start_in_paragraph(node, start_pat)
 
     for node in nodes_to_remove:
         if node.parentNode:
