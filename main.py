@@ -256,6 +256,7 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
     Hàm này duyệt các childNodes (w:p, w:tbl) của body và xoá mọi thứ ở giữa,
     bao gồm cả bảng.
     Các tag start/end sẽ được xoá khỏi các node chứa chúng.
+    Trả về tổng số thay đổi (nodes bị xóa + số cặp được xử lý trong cùng đoạn).
     """
     # Xác định pattern dựa trên type
     if start_tag_type == 'BLOCK_START':
@@ -273,10 +274,11 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
     else:
         print(f"Lỗi: Kiểu tag kết thúc không hợp lệ: {end_tag_type}")
         return 0 # Kiểu tag không hợp lệ
-    
+
     nodes_to_remove = []
+    pairs_handled = 0  # Đếm số cặp được xử lý trong cùng đoạn
     in_block = False
-    
+
     # body.childNodes là một Live NodeList, cần copy ra list để xoá an toàn
     for node in list(body.childNodes):
         if node.nodeType != node.ELEMENT_NODE:
@@ -287,32 +289,38 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
             continue
 
         node_text = get_all_text_from_element(node)
+        start_match = re.search(start_pat, node_text)
+        end_match = re.search(end_pat, node_text)
 
         if in_block:
-            if re.search(end_pat, node_text):
+            if end_match:
                 in_block = False
                 # Xoá tag [[END_TAG]] khỏi node này
                 if node.tagName == 'w:p':
                     _cut_before_end_in_paragraph(node, end_pat)
             else:
                 nodes_to_remove.append(node)
-        
-        elif re.search(start_pat, node_text):
-            # Nếu start và end trong cùng 1 node
-            if re.search(end_pat, node_text):
-                 if node.tagName == 'w:p':
-                    _remove_pairs_in_same_paragraph(node, start_pat, end_pat)
-            else:
-                in_block = True
-                # Xoá tag [[START_TAG...]] và phần sau nó trong node này
+
+        elif start_match:
+            # Nếu start và end trong cùng 1 node và theo đúng thứ tự
+            if end_match and start_match.start() < end_match.start():
                 if node.tagName == 'w:p':
-                    _cut_after_start_in_paragraph(node, start_pat)
+                    if _remove_pairs_in_same_paragraph(node, start_pat, end_pat):
+                        pairs_handled += 1
+                # Với bảng (w:tbl), nếu START và END trong cùng 1 bảng thì xóa cả bảng
+                elif node.tagName == 'w:tbl':
+                    nodes_to_remove.append(node)
+            else:
+                # Bắt đầu một block mới
+                in_block = True
+                # Xóa toàn bộ node chứa START_TAG
+                nodes_to_remove.append(node)
 
     for node in nodes_to_remove:
         if node.parentNode:
             node.parentNode.removeChild(node)
-            
-    return len(nodes_to_remove)
+
+    return len(nodes_to_remove) + pairs_handled
 
 # *** KẾT THÚC THAY ĐỔI ***
 # (Hàm `remove_block_content_including_tables` và `process_removal_between_tags` cũ đã bị xóa)
@@ -344,13 +352,22 @@ def clear_row_content_with_tag(body, label):
 def remove_rows_with_tag(body, label):
     """Xoá w:tr có [[ROW{label}]] (vd [[ROW0]])."""
     rows_removed = 0
-    for tbl in body.getElementsByTagName('w:tbl'):
-        for tr in list(tbl.getElementsByTagName('w:tr')):
-            row_text = get_all_text_from_element(tr)
-            if re.search(rf'\[\[ROW{label}\]\]', row_text):
-                if tr.parentNode:
-                    tr.parentNode.removeChild(tr)
-                    rows_removed += 1
+    tag_pattern = rf'\[\[ROW{label}\]\]'
+    
+    # We need to iterate and remove carefully.
+    # It's better to find all rows to be removed first, then remove them.
+    rows_to_remove = []
+    for tr in body.getElementsByTagName('w:tr'):
+        row_text = get_all_text_from_element(tr)
+        if re.search(tag_pattern, row_text):
+            rows_to_remove.append(tr)
+
+    for tr in rows_to_remove:
+        if tr.parentNode:
+            print(f"  - Removing a w:tr node containing [[ROW{label}]]")
+            tr.parentNode.removeChild(tr)
+            rows_removed += 1
+            
     return rows_removed
 
 def _replace_tags_in_text_nodes(body, patterns):
@@ -431,6 +448,67 @@ def remove_all_remaining_tags(body):
                 
     return changed_elements_count
 
+def classify_node(node):
+    if node.nodeType != node.ELEMENT_NODE or node.tagName not in ['w:p', 'w:tbl']:
+        return 'other'
+    
+    if node.tagName == 'w:tbl':
+        return 'content'
+
+    # It's a w:p
+    text = get_all_text_from_element(node).strip()
+    has_text = bool(text)
+    has_drawing = bool(node.getElementsByTagName('w:drawing'))
+
+    is_page_break = False
+    for br in node.getElementsByTagName('w:br'):
+        if br.getAttribute('w:type') == 'page':
+            is_page_break = True
+            break
+    
+    if not is_page_break:
+        pPrs = node.getElementsByTagName('w:pPr')
+        if pPrs:
+            if pPrs[0].getElementsByTagName('w:sectPr'):
+                is_page_break = True
+
+    if is_page_break:
+        if has_text or has_drawing:
+            return 'content_and_break'
+        else:
+            return 'break'
+    
+    if has_text or has_drawing:
+        return 'content'
+    
+    return 'empty_p' # Empty paragraph
+
+def remove_blank_pages(body):
+    nodes = list(body.childNodes)
+    classifications = [classify_node(n) for n in nodes]
+
+    nodes_to_remove = []
+    for i in range(len(classifications) - 1):
+        # Look for a break followed by another break, with only empty paragraphs in between
+        if classifications[i] == 'break':
+            # Find the next non-empty_p classification
+            next_content_idx = -1
+            for j in range(i + 1, len(classifications)):
+                if classifications[j] != 'empty_p':
+                    next_content_idx = j
+                    break
+            
+            if next_content_idx != -1 and classifications[next_content_idx] in ['break', 'content_and_break']:
+                # We have a break, followed by empties, followed by another break.
+                # Remove the first break.
+                nodes_to_remove.append(nodes[i])
+
+    for node in nodes_to_remove:
+        if node.parentNode:
+            node.parentNode.removeChild(node)
+    
+    return len(nodes_to_remove)
+
 # ------------------------------
 # Orchestrator
 # ------------------------------
@@ -448,22 +526,35 @@ def process_document_xml(xml_path):
 
     # *** BẮT ĐẦU THAY ĐỔI ***
     # 1) Xoá toàn bộ block [[BLOCK_START0]]...[[BLOCK_END]], bao gồm cả bảng
+    # Lặp lại cho đến khi không còn cặp nào
     print("\nBước 1: Xử lý BLOCK_START0..BLOCK_END (bao gồm cả bảng)")
-    # Sử dụng hàm mới
-    removed_nodes_block = remove_nodes_between_tags(body, 'BLOCK_START', 'BLOCK_END', '0')
-    print(f"  Đã xoá {removed_nodes_block} nodes (đoạn, bảng) ở giữa các BLOCK tag")
+    total_removed_block = 0
+    iteration = 0
+    while True:
+        iteration += 1
+        removed_nodes_block = remove_nodes_between_tags(body, 'BLOCK_START', 'BLOCK_END', '0')
+        total_removed_block += removed_nodes_block
+        print(f"  [Lần {iteration}] Xử lý {removed_nodes_block} thay đổi")
+        if removed_nodes_block == 0:
+            break
+    print(f"  Tổng cộng đã xoá/xử lý {total_removed_block} nodes/cặp")
 
     # 2) SECTION_START0..SECTION_END (hiện cũng xoá bao gồm cả bảng)
+    # Lặp lại cho đến khi không còn cặp nào
     print("\nBước 2: Xử lý SECTION_START0..SECTION_END (bao gồm cả bảng)")
-    # Sử dụng CÙNG MỘT HÀM MỚI cho SECTION
-    removed_nodes_section = remove_nodes_between_tags(body, 'SECTION_START', 'SECTION_END', '0')
-    print(f"  Đã xoá {removed_nodes_section} nodes (đoạn, bảng) ở giữa các SECTION tag")
+    total_removed_section = 0
+    while True:
+        removed_nodes_section = remove_nodes_between_tags(body, 'SECTION_START', 'SECTION_END', '0')
+        total_removed_section += removed_nodes_section
+        if removed_nodes_section == 0:
+            break
+    print(f"  Đã xoá {total_removed_section} nodes (đoạn, bảng) ở giữa các SECTION tag")
     # *** KẾT THÚC THAY ĐỔI ***
 
-    # 3) Xoá hết nội dung hàng [[ROW0]]
-    print("\nBước 3: Xoá hết nội dung các hàng có [[ROW0]]")
-    rows_cleared_0 = clear_row_content_with_tag(body, '0')
-    print(f"  Đã xoá nội dung của {rows_cleared_0} hàng ROW0")
+    # 3) Xoá hoàn toàn hàng [[ROW0]]
+    print("\nBước 3: Xoá hoàn toàn các hàng có [[ROW0]]")
+    rows_removed_0 = remove_rows_with_tag(body, '0')
+    print(f"  Đã xoá {rows_removed_0} hàng ROW0")
 
     # 4) Xoá tag [[ROW1]] (giữ nội dung)
     print("\nBước 4: Xoá tag [[ROW1]] (giữ nội dung)")
@@ -474,8 +565,13 @@ def process_document_xml(xml_path):
     tags_changed = remove_all_remaining_tags(body)
     print(f"  Đã sửa {tags_changed} text nodes có tag")
 
-    # 6) Lưu lại
-    print("\nBước 6: Lưu document.xml")
+    # 6) Xoá trang trắng
+    print("\nBước 6: Xoá các trang trắng")
+    pages_removed = remove_blank_pages(body)
+    print(f"  Đã xoá {pages_removed} trang trắng")
+
+    # 7) Lưu lại
+    print("\nBước 7: Lưu document.xml")
     with open(xml_path, 'w', encoding='utf-8') as f:
         f.write(dom.toxml())
     print("Hoàn thành xử lý document.xml")
