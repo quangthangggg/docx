@@ -278,6 +278,8 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
     nodes_to_remove = []
     pairs_handled = 0  # Đếm số cặp được xử lý trong cùng đoạn
     in_block = False
+    
+    end_pat_compiled = re.compile(end_pat)
 
     # body.childNodes là một Live NodeList, cần copy ra list để xoá an toàn
     for node in list(body.childNodes):
@@ -290,7 +292,7 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
 
         node_text = get_all_text_from_element(node)
         start_match = re.search(start_pat, node_text)
-        end_match = re.search(end_pat, node_text)
+        end_match = re.search(end_pat, node_text) # This is used for the in_block check
 
         if in_block:
             if end_match:
@@ -307,8 +309,11 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
                 nodes_to_remove.append(node)
 
         elif start_match:
-            # Nếu start và end trong cùng 1 node và theo đúng thứ tự
-            if end_match and start_match.start() < end_match.start():
+            # Find the next end_match that appears *after* the start_match
+            end_match_after = end_pat_compiled.search(node_text, pos=start_match.end())
+
+            # Nếu có một cặp START...END trong cùng một node
+            if end_match_after:
                 if node.tagName == 'w:p':
                     if _remove_pairs_in_same_paragraph(node, start_pat, end_pat):
                         pairs_handled += 1
@@ -317,15 +322,14 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
                         if not node_text_after.strip():
                             nodes_to_remove.append(node)
                 elif node.tagName == 'w:tbl':
-                    # If tags are found within a table, don't delete the whole table.
-                    # Instead, process the paragraphs within the table cells.
+                    # Process paragraphs within the table
                     for p_in_tbl in node.getElementsByTagName('w:p'):
                         p_text = get_all_text_from_element(p_in_tbl)
                         if re.search(start_pat, p_text) and re.search(end_pat, p_text):
                             if _remove_pairs_in_same_paragraph(p_in_tbl, start_pat, end_pat):
                                 pairs_handled += 1
             else:
-                # Bắt đầu một block mới
+                # Bắt đầu một block mới (không có end tag trong cùng node)
                 in_block = True
                 # Check if the node will be empty after removing the tag and content after it
                 node_text_after_removal = re.sub(start_pat + r'.*$', '', node_text, flags=re.DOTALL)
