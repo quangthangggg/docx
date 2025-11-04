@@ -312,6 +312,10 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
                 if node.tagName == 'w:p':
                     if _remove_pairs_in_same_paragraph(node, start_pat, end_pat):
                         pairs_handled += 1
+                        # Check if the paragraph is now empty and should be removed
+                        node_text_after = get_all_text_from_element(node)
+                        if not node_text_after.strip():
+                            nodes_to_remove.append(node)
                 # Với bảng (w:tbl), nếu START và END trong cùng 1 bảng thì xóa cả bảng
                 elif node.tagName == 'w:tbl':
                     nodes_to_remove.append(node)
@@ -520,6 +524,23 @@ def remove_blank_pages(body):
     
     return len(nodes_to_remove)
 
+def remove_all_empty_paragraphs(body):
+    """Removes all paragraphs that contain no visible content."""
+    nodes_to_remove = []
+    for p in body.getElementsByTagName('w:p'):
+        text = get_all_text_from_element(p).strip()
+        has_drawing = p.getElementsByTagName('w:drawing')
+        if not text and not has_drawing:
+            # Ensure the paragraph is not a page break before removing
+            if classify_node(p) not in ['break', 'content_and_break']:
+                nodes_to_remove.append(p)
+    
+    for node in nodes_to_remove:
+        if node.parentNode:
+            node.parentNode.removeChild(node)
+            
+    return len(nodes_to_remove)
+
 # ------------------------------
 # Orchestrator
 # ------------------------------
@@ -581,8 +602,13 @@ def process_document_xml(xml_path):
     pages_removed = remove_blank_pages(body)
     print(f"  Đã xoá {pages_removed} trang trắng")
 
-    # 7) Lưu lại
-    print("\nBước 7: Lưu document.xml")
+    # 7) Dọn dẹp các đoạn văn trống
+    print("\nBước 7: Dọn dẹp các đoạn văn trống")
+    empty_paras_removed = remove_all_empty_paragraphs(body)
+    print(f"  Đã xoá {empty_paras_removed} đoạn văn trống")
+
+    # 8) Lưu lại
+    print("\nBước 8: Lưu document.xml")
     with open(xml_path, 'w', encoding='utf-8') as f:
         f.write(dom.toxml())
     print("Hoàn thành xử lý document.xml")
