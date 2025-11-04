@@ -316,9 +316,14 @@ def remove_nodes_between_tags(body, start_tag_type, end_tag_type, label):
                         node_text_after = get_all_text_from_element(node)
                         if not node_text_after.strip():
                             nodes_to_remove.append(node)
-                # Với bảng (w:tbl), nếu START và END trong cùng 1 bảng thì xóa cả bảng
                 elif node.tagName == 'w:tbl':
-                    nodes_to_remove.append(node)
+                    # If tags are found within a table, don't delete the whole table.
+                    # Instead, process the paragraphs within the table cells.
+                    for p_in_tbl in node.getElementsByTagName('w:p'):
+                        p_text = get_all_text_from_element(p_in_tbl)
+                        if re.search(start_pat, p_text) and re.search(end_pat, p_text):
+                            if _remove_pairs_in_same_paragraph(p_in_tbl, start_pat, end_pat):
+                                pairs_handled += 1
             else:
                 # Bắt đầu một block mới
                 in_block = True
